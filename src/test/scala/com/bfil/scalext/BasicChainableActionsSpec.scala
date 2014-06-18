@@ -1,51 +1,54 @@
 package com.bfil.scalext
 
-import com.bfil.scalext.actions.BasicChainableActions
+class BasicChainableActionsSpec extends ChainableActionsSpec {
 
-class BasicChainableActionsSpec extends ChainableActionsSpec with BasicChainableActions[SpecsContext] {
-
-  "pass" should "call the inner action without changing the context" in {
-    start {
-      pass {
-        check { ctx =>
-          ctx.key should be("test")
-          ctx.value should be(0)
+  "pass" should {
+    "call the inner action without changing the context" in new BasicChainableActionsSpecContext {
+      start {
+        pass {
+          check { ctx =>
+            ctx.key must beEqualTo("test")
+            ctx.value must beEqualTo(0)
+          }
         }
       }
     }
   }
-  
-  "mapContext" should "create a new context and pass it to the inner action" in {
-    
-    def increaseValue(ctx: SpecsContext) = ctx.copy(value = ctx.value + 1)
-    
-    start {
-      mapContext(increaseValue) {         
-        check { ctx =>
-          ctx.key should be("test")
-          ctx.value should be(1)
+
+  "mapContext" should {
+    "create a new context and pass it to the inner action" in new BasicChainableActionsSpecContext {
+      def increaseValue(ctx: TestContext) = ctx.copy(value = ctx.value + 1)
+
+      start {
+        mapContext(increaseValue) {
+          check { ctx =>
+            ctx.key must beEqualTo("test")
+            ctx.value must beEqualTo(1)
+          }
         }
       }
     }
   }
-  
-  "provide" should "provide a custom value to the inner action" in {    
-    start {
-      provide("a string") { str =>
-        str should be("a string")
-        done
+
+  "provide" should {
+    "provide a custom value to the inner action" in new BasicChainableActionsSpecContext {
+      start {
+        provide("a string") { str =>
+          ctx => str must beEqualTo("a string")
+        }
       }
     }
   }
-  
-  "extract" should "extract some value from the context and pass it to the inner action" in {
-    
-    def getValue(ctx: SpecsContext) = ctx.value
-    
-    start {
-      extract(getValue) { value =>
-        value should be(0)
-        done
+
+  "extract" should {
+    "extract some value from the context and pass it to the inner action" in new BasicChainableActionsSpecContext {
+
+      def getValue(ctx: TestContext) = ctx.value
+
+      start {
+        extract(getValue) { value =>
+          ctx => value must beEqualTo(0)
+        }
       }
     }
   }

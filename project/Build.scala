@@ -34,7 +34,8 @@ object Dependencies {
     "com.chuusai" %% "shapeless" % "1.2.4",
     "com.typesafe.akka" %% "akka-actor" % "2.3.1",
     "org.mockito" % "mockito-all" % "1.9.5" % "test",
-    "org.scalatest" %% "scalatest" % "2.0" % "test")
+    "org.specs2" %% "specs2" % "2.3.12" % "test",
+    "org.hamcrest" % "hamcrest-all" % "1.3")
 }
 
 object Resolvers {

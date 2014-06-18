@@ -1,154 +1,124 @@
 package com.bfil.scalext
 
-import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-import com.bfil.scalext.actions.FutureChainableActions
+class FutureChainableActionsSpec extends ChainableActionsSpec {
 
-class FutureChainableActionsSpec extends ChainableActionsSpec with FutureChainableActions[SpecsContext] {
+  "onComplete" should {
+    "call the inner action with the expected future result on success" in new FutureChainableActionsSpecContext {
 
-  implicit val executionContext = scala.concurrent.ExecutionContext.global
+      start {
+        onComplete(sayHello) {
+          case Success(str) => ctx => str must beEqualTo("hello")
+          case Failure(ex) => ctx => failure
+        }
+      }
+    }
 
-  def sayHello = Future { "hello" }
-  def throwAnException = Future { throw new Exception("Something went wrong") }
+    "call the inner action with the expected future result on failure" in new FutureChainableActionsSpecContext {
+      start {
+        onComplete(throwAnException) {
+          case Success(str) => ctx => failure
+          case Failure(ex) => ctx => ex.getMessage must beEqualTo("Something went wrong")
+        }
+      }
+    }
 
-  def sayHelloUsingContext(ctx: SpecsContext) = Future { s"hello ${ctx.key}" }
-  def throwAnExceptionUsingContext(ctx: SpecsContext) = Future {
-    throw new Exception(s"Something went wrong with error code: ${ctx.value}")
-  }
+    "call the inner action with the expected future result on success (with context)" in new FutureChainableActionsSpecContext {
+      start {
+        onComplete { ctx: TestContext =>
+          sayHelloUsingContext(ctx)
+        } {
+          case Success(str) => ctx => str must beEqualTo("hello test")
+          case Failure(ex) => ctx => failure
+        }
+      }
+    }
 
-  "onComplete" should "call the inner action with the expected future result on success" in {
-    start {
-      onComplete(sayHello) {
-        case Success(str) =>
-          str should be("hello")
-          done
-        case Failure(ex) =>
-          fail
-          done
+    "call the inner action with the expected future result on failure (with context)" in new FutureChainableActionsSpecContext {
+      start {
+        onComplete { ctx: TestContext =>
+          throwAnExceptionUsingContext(ctx)
+        } {
+          case Success(str) => ctx => failure
+          case Failure(ex) => ctx => ex.getMessage must beEqualTo("Something went wrong with error code: 0")
+        }
       }
     }
   }
 
-  it should "call the inner action with the expected future result on failure" in {
-    start {
-      onComplete(throwAnException) {
-        case Success(str) =>
-          fail
-          done
-        case Failure(ex) =>
-          ex.getMessage should be("Something went wrong")
-          done
+  "onSuccess" should {
+    "call the inner action with the expected future result on success" in new FutureChainableActionsSpecContext {
+      start {
+        onSuccess(sayHello) { str =>
+          ctx => str must beEqualTo("hello")
+        }
+      }
+    }
+
+    "not call the inner action on failure" in new FutureChainableActionsSpecContext {
+      start {
+        onSuccess(throwAnException) { str =>
+          ctx => failure
+        }
+      }
+    }
+
+    "call the inner action with the expected future result on success (with context)" in new FutureChainableActionsSpecContext {
+      start {
+        onSuccess { ctx: TestContext =>
+          sayHelloUsingContext(ctx)
+        } { str =>
+          ctx => str must beEqualTo("hello test")
+        }
+      }
+    }
+
+    "not call the inner action on failure (with context)" in new FutureChainableActionsSpecContext {
+      start {
+        onSuccess { ctx: TestContext =>
+          throwAnExceptionUsingContext(ctx)
+        } { str =>
+          ctx => failure
+        }
       }
     }
   }
 
-  it should "call the inner action with the expected future result on success (with context)" in {
-    start {
-      onComplete { ctx: SpecsContext =>
-        sayHelloUsingContext(ctx)
-      } {
-        case Success(str) =>
-          str should be("hello test")
-          done
-        case Failure(ex) =>
-          fail
-          done
+  "onFailure" should {
+    "call the inner action with the exception thrown on failure" in new FutureChainableActionsSpecContext {
+      start {
+        onFailure(throwAnException) { ex =>
+          ctx => ex.getMessage must beEqualTo("Something went wrong")
+        }
       }
     }
-  }
 
-  it should "call the inner action with the expected future result on failure (with context)" in {
-    start {
-      onComplete { ctx: SpecsContext =>
-        throwAnExceptionUsingContext(ctx)
-      } {
-        case Success(str) =>
-          fail
-          done
-        case Failure(ex) =>
-          ex.getMessage should be("Something went wrong with error code: 0")
-          done
+    "not call the inner action on success" in new FutureChainableActionsSpecContext {
+      start {
+        onFailure(sayHello) { ex =>
+          ctx => failure
+        }
       }
     }
-  }
 
-  "onSuccess" should "call the inner action with the expected future result on success" in {
-    start {
-      onSuccess(sayHello) { str =>
-        str should be("hello")
-        done
+    "call the inner action with the exception thrown on failure (with context)" in new FutureChainableActionsSpecContext {
+      start {
+        onFailure { ctx: TestContext =>
+          throwAnExceptionUsingContext(ctx)
+        } { ex =>
+          ctx => ex.getMessage must beEqualTo("Something went wrong with error code: 0")
+        }
       }
     }
-  }
 
-  it should "not call the inner action on failure" in {
-    start {
-      onSuccess(throwAnException) { str =>
-        fail
-        done
-      }
-    }
-  }
-  
-  it should "call the inner action with the expected future result on success (with context)" in {
-    start {
-      onSuccess { ctx: SpecsContext =>
-        sayHelloUsingContext(ctx)
-      } { str =>
-        str should be("hello test")
-        done
-      }
-    }
-  }
-
-  it should "not call the inner action on failure (with context)" in {
-    start {
-      onSuccess { ctx: SpecsContext =>
-        throwAnExceptionUsingContext(ctx)
-      } { str =>
-        fail
-        done
-      }
-    }
-  }
-
-  "onFailure" should "call the inner action with the exception thrown on failure" in {
-    start {
-      onFailure(throwAnException) { ex =>
-        ex.getMessage should be("Something went wrong")
-        done
-      }
-    }
-  }
-
-  it should "not call the inner action on success" in {
-    start {
-      onFailure(sayHello) { ex =>
-        fail
-        done
-      }
-    }
-  }
-  
-  it should "call the inner action with the exception thrown on failure (with context)" in {
-    start {
-      onFailure { ctx: SpecsContext =>
-        throwAnExceptionUsingContext(ctx)
-      } { ex =>
-        ex.getMessage should be("Something went wrong with error code: 0")
-        done
-      }
-    }
-  }
-
-  it should "not call the inner action on success (with context)" in {
-    start {
-      onFailure { ctx: SpecsContext =>
-        sayHelloUsingContext(ctx)
-      } { ex =>
-        fail
-        done
+    "not call the inner action on success (with context)" in new FutureChainableActionsSpecContext {
+      start {
+        onFailure { ctx: TestContext =>
+          sayHelloUsingContext(ctx)
+        } { ex =>
+          ctx => failure
+        }
       }
     }
   }
