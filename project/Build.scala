@@ -17,11 +17,12 @@ object ScalextBuild extends Build {
     name := "scalext",
     organization := "com.bfil",
     version := appVersion,
-    scalaVersion := "2.10.4",
-    crossPaths := false,
+    scalaVersion := "2.11.1",
+    crossScalaVersions  := Seq("2.11.1", "2.10.4"),
+    crossVersion := CrossVersion.binary,
     organizationName := "Bruno Filippone",
     organizationHomepage := Some(url("http://www.b-fil.com")),
-    libraryDependencies ++= Dependencies.all,
+    libraryDependencies <++= scalaVersion(Dependencies.all(_)),
     resolvers ++= Resolvers.all)
 
   lazy val compilersSettings = Seq(
@@ -30,9 +31,12 @@ object ScalextBuild extends Build {
 }
 
 object Dependencies {
-  val all = Seq(
-    "com.chuusai" %% "shapeless" % "1.2.4",
-    "com.typesafe.akka" %% "akka-actor" % "2.3.1",
+  def all(scalaVersion: String) = Seq(
+    scalaVersion match {
+      case "2.11.1" => "com.chuusai" %% "shapeless" % "2.0.0"
+      case "2.10.4" => "com.chuusai" %% "shapeless" % "1.2.4"
+    },
+    "com.typesafe.akka" %% "akka-actor" % "2.3.3",
     "org.mockito" % "mockito-all" % "1.9.5" % "test",
     "org.specs2" %% "specs2" % "2.3.12" % "test",
     "org.hamcrest" % "hamcrest-all" % "1.3")

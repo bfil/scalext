@@ -28,7 +28,7 @@ trait ContextualDslTestkit[T] extends ChainableActions[T] {
         type Result = CheckMagnet0
         def apply() = new CheckMagnet0 {
           def apply(assertions: Action) {
-            val p = scala.concurrent.promise[Unit]
+            val p = scala.concurrent.Promise[Unit]
             val f = p.future
             action { ctx =>
               try {
@@ -48,7 +48,7 @@ trait ContextualDslTestkit[T] extends ChainableActions[T] {
         type Result = CheckMagnet1[T]
         def apply() = new CheckMagnet1[T] {
           def apply(assertions: T => Action) = {
-            val p = scala.concurrent.promise[Unit]
+            val p = scala.concurrent.Promise[Unit]
             val f = p.future
             action { t =>
               ctx =>
