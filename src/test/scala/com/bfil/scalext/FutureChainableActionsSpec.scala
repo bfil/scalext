@@ -7,21 +7,21 @@ class FutureChainableActionsSpec extends ChainableActionsSpec {
 
   "onComplete" should {
     "call the inner action with the expected future result on success" in new FutureChainableActionsSpecContext {
-      check(onComplete(sayHello)) {
+      asyncCheck(onComplete(sayHello)) {
         case Success(str) => ctx => str must beEqualTo("hello")
         case Failure(ex) => ctx => failure
       }
     }
 
     "call the inner action with the expected future result on failure" in new FutureChainableActionsSpecContext {
-      check(onComplete(throwAnException)) {
+      asyncCheck(onComplete(throwAnException)) {
         case Success(str) => ctx => failure
         case Failure(ex) => ctx => ex.getMessage must beEqualTo("Something went wrong")
       }
     }
 
     "call the inner action with the expected future result on success (with context)" in new FutureChainableActionsSpecContext {
-      check(onComplete { ctx: TestContext =>
+      asyncCheck(onComplete { ctx: TestContext =>
         sayHelloUsingContext(ctx)
       }) {
         case Success(str) => ctx => str must beEqualTo("hello test")
@@ -30,7 +30,7 @@ class FutureChainableActionsSpec extends ChainableActionsSpec {
     }
 
     "call the inner action with the expected future result on failure (with context)" in new FutureChainableActionsSpecContext {
-      check(onComplete { ctx: TestContext =>
+      asyncCheck(onComplete { ctx: TestContext =>
         throwAnExceptionUsingContext(ctx)
       }) {
         case Success(str) => ctx => failure
@@ -41,19 +41,19 @@ class FutureChainableActionsSpec extends ChainableActionsSpec {
 
   "onSuccess" should {
     "call the inner action with the expected future result on success" in new FutureChainableActionsSpecContext {
-      check(onSuccess(sayHello)) { str =>
+      asyncCheck(onSuccess(sayHello)) { str =>
         ctx => str must beEqualTo("hello")
       }
     }
 
     "not call the inner action on failure" in new FutureChainableActionsSpecContext {
-      check(onSuccess(throwAnException)) { str =>
+      asyncCheck(onSuccess(throwAnException)) { str =>
         ctx => failure
       } must throwA[TimeoutException]
     }
 
     "call the inner action with the expected future result on success (with context)" in new FutureChainableActionsSpecContext {
-      check(onSuccess { ctx: TestContext =>
+      asyncCheck(onSuccess { ctx: TestContext =>
         sayHelloUsingContext(ctx)
       }) { str =>
         ctx => str must beEqualTo("hello test")
@@ -61,7 +61,7 @@ class FutureChainableActionsSpec extends ChainableActionsSpec {
     }
 
     "not call the inner action on failure (with context)" in new FutureChainableActionsSpecContext {
-      check(onSuccess { ctx: TestContext =>
+      asyncCheck(onSuccess { ctx: TestContext =>
         throwAnExceptionUsingContext(ctx)
       }) { str =>
         ctx => failure
@@ -71,19 +71,19 @@ class FutureChainableActionsSpec extends ChainableActionsSpec {
 
   "onFailure" should {
     "call the inner action with the exception thrown on failure" in new FutureChainableActionsSpecContext {
-      check(onFailure(throwAnException)) { ex =>
+      asyncCheck(onFailure(throwAnException)) { ex =>
         ctx => ex.getMessage must beEqualTo("Something went wrong")
       }
     }
 
     "not call the inner action on success" in new FutureChainableActionsSpecContext {
-      check(onFailure(sayHello)) { ex =>
+      asyncCheck(onFailure(sayHello)) { ex =>
         ctx => failure
       } must throwA[TimeoutException]
     }
 
     "call the inner action with the exception thrown on failure (with context)" in new FutureChainableActionsSpecContext {
-      check(onFailure { ctx: TestContext =>
+      asyncCheck(onFailure { ctx: TestContext =>
         throwAnExceptionUsingContext(ctx)
       }) { ex =>
         ctx => ex.getMessage must beEqualTo("Something went wrong with error code: 0")
@@ -91,7 +91,7 @@ class FutureChainableActionsSpec extends ChainableActionsSpec {
     }
 
     "not call the inner action on success (with context)" in new FutureChainableActionsSpecContext {
-      check(onFailure { ctx: TestContext =>
+      asyncCheck(onFailure { ctx: TestContext =>
         sayHelloUsingContext(ctx)
       }) { ex =>
         ctx => failure
