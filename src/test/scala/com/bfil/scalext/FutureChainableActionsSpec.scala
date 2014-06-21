@@ -1,7 +1,8 @@
 package com.bfil.scalext
 
-import scala.util.{ Failure, Success }
 import java.util.concurrent.TimeoutException
+
+import scala.util.{Failure, Success}
 
 class FutureChainableActionsSpec extends ChainableActionsSpec {
 

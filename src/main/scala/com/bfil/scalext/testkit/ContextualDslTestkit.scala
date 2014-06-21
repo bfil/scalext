@@ -1,11 +1,9 @@
 package com.bfil.scalext.testkit
 
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.{Duration, DurationInt}
 
 import com.bfil.scalext.ChainableActions
-
-import scala.concurrent.duration.Duration
 
 trait ContextualDslTestkit[T] extends ChainableActions[T] {
 
