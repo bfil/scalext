@@ -1,4 +1,4 @@
-scalext
+Scalext
 =======
 
 A scala library that enable the creation of contextual DSLs, inspired by the routing module of [Spray](http://spray.io/).
