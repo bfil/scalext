@@ -3,7 +3,7 @@ import Keys._
 
 object ScalextBuild extends Build {
 
-  val appVersion = "0.1.0"
+  val buildVersion = "0.2.0-SNAPSHOT"
 
   lazy val Scalext = Project(
     id = "scalext",
@@ -16,7 +16,7 @@ object ScalextBuild extends Build {
   lazy val buildSettings = Seq(
     name := "scalext",
     organization := "com.bfil",
-    version := appVersion,
+    version := buildVersion,
     scalaVersion := "2.11.1",
     crossScalaVersions  := Seq("2.11.1", "2.10.4"),
     crossVersion := CrossVersion.binary,
