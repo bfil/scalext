@@ -3,12 +3,12 @@ Scalext
 
 A scala library that enable the creation of contextual DSLs, inspired by the routing module of [Spray](http://spray.io/).
 
-It uses part of the internal code of [spray-routing](https://github.com/spray/spray/tree/master/spray-routing/src/main/scala/spray/routing) and its directives, but enables developers to use their own contexts and create their own DSL.
+It uses part of the internal code of [spray-routing](https://github.com/spray/spray/tree/master/spray-routing/src/main/scala/spray/routing) and its directives, but enables to use custom contexts and create a context-specific DSL.
 
-Set up the dependencies
------------------------
+Setting up the dependencies
+---------------------------
 
-Scalext is available at my [S3 Repository](http://shrub.appspot.com/bfil-mvn-repo), and it is cross compiled and published for both Scala 2.10 and 2.11.
+__Scalext__ is available at my [S3 Repository](http://shrub.appspot.com/bfil-mvn-repo), and it is cross compiled and published for both Scala 2.10 and 2.11.
 
 Using SBT, add the following plugin:
 
@@ -56,13 +56,13 @@ Let's use a simple calculator DSL as an example.
 
 The calculator DSL context will be a simple class that stores a promise object (which will resolve into a future result at some point) and the current calculation value.
 
-The _ArihmeticContext_ object can be a simple case class:
+The `ArihmeticContext` object can be a simple case class:
 
 ```scala
 case class ArithmeticContext(resultPromise: Promise[Double], value: Double)
 ```
 
-The DSL actions will manipulate this context, we can put the actions in a _CalculatorDsl_ trait:
+The DSL actions will manipulate this context, we can put the actions in a `CalculatorDsl` trait:
 
 ```scala
 trait CalculatorDsl extends ContextualDsl[ArithmeticContext] {
@@ -70,9 +70,9 @@ trait CalculatorDsl extends ContextualDsl[ArithmeticContext] {
 }
 ```
 
-The first action triggering the DSL logic needs to accept an _Action_ as a parameter.
+The first action triggering the DSL logic needs to accept an `Action` as a parameter.
 
-In this example we create an initial action _startWith_ that accepts an initial value, it creates the _ArithmeticContext_ storing the initial value and a promise, and it passes the newly created context into the action specified.
+In this example we create an initial action `startWith` that accepts an initial value, it creates the `ArithmeticContext` storing the initial value and a promise, and it passes the newly created context into the action specified.
 
 ```scala
 def startWith(initialValue: Long)(action: Action) = {
@@ -84,7 +84,7 @@ def startWith(initialValue: Long)(action: Action) = {
 
 The above method returns the future associated with the promise, so that we can resolve the promise at a later point when we want to return a result.
 
-Let's define some basic actions for the DSL (_add_, _subtract_, _multiplyBy_, and _divideBy_), the actions use the _mapContext_ helper method of the _ContextualDsl_ trait, which modifies the immutable context and passes it through to the inner action.
+Let's define some basic actions for the DSL (`add`, `subtract`, `multiplyBy`, and `divideBy`), the actions use the `mapContext` helper method of the `ContextualDsl` trait, which modifies the immutable context and passes it through to the inner action.
 
 ```scala
 def add(value: Double) = mapContext(ctx => ctx.copy(value = ctx.value + value))
@@ -99,9 +99,9 @@ The inner most method of the DSL usually must be a simple action that takes the 
   def returnResult = ActionResult { ctx => ctx.resultPromise.completeWith(Future { ctx.value }) }
 ```
 
-We called our final action _returnResult_, and we defined it using the apply method of the _ActionResult_ object, which makes the code more readable, but it could just be a simple method with the signature _Context => Unit_.
+We called our final action `returnResult`, and we defined it using the apply method of the `ActionResult` object, which makes the code more readable, but it could just be a simple method with the signature `Context => Unit`.
 
-Finally using our _CalculatorDsl_ in our code will look like this:
+Finally using our `CalculatorDsl` in our code will look like this:
 
 ```scala
 class Calculator extends CalculatorDsl {
@@ -124,7 +124,241 @@ This is just a simple example of how the library can be used to create DSLs that
 
 ### Documentation
 
-TODO 
+The main components of __Scalext__ are the `ContextualDsl` trait and the DSL actions.
+
+#### Contextual DSL
+
+The `ContextualDsl` trait accepts a context type parameter
+
+```scala
+trait ContextualDsl[T]
+```
+
+Extending the `ContextualDsl` trait enables the creation of DSL actions
+
+```scala
+case class ExampleContext()
+trait MyDsl extends ContextualDsl[ExampleContext] {
+  // actions in here..
+}
+```
+
+DSL Actions are methods that accepts a context and return Unit
+
+```scala
+type Action = Context => Unit
+```
+
+#### DSL Actions
+
+The following DSL actions can be used as basic helpers to create other DSL actions
+
+__mapContext__ 
+
+```scala
+mapContext(f: Context => Context)
+```
+
+It maps the context to a new context and passes it into the inner action:
+
+```scala
+mapContext ( ctx => updateContext(ctx) ) {
+  ctx => Unit
+}
+```
+
+__provide__ 
+
+```scala
+provide[T](value: T)
+```
+
+It provides/passes a value into the inner action:
+
+```scala
+provide ( "hello" ) { str =>
+  ctx => println(str) // hello
+}
+```
+
+__extract__ 
+
+```scala
+extract[T](f: Context => T)
+```
+
+It extracts a value from the context and passes it into the inner action:
+
+```scala
+extract ( ctx => ctx.total ) { total =>
+  ctx => println(total)
+}
+```
+
+__onComplete__ 
+
+```scala
+onComplete[T](f: => Future[T])(implicit ec: ExecutionContext)
+onComplete[T](f: Context => Future[T])(implicit ec: ExecutionContext)
+```
+
+It waits for the completion of a future a passes the future result into the inner action:
+
+```scala
+onComplete ( Future { "hello" } ) { 
+  case Success(str) => ctx => println(str) // hello
+  case Failure(ex) => throw ex
+}
+```
+
+It can also accept as a parameter a function that returns a future from a context:
+
+```scala
+onComplete ( ctx => Future { "hello" } ) { 
+  case Success(str) => ctx => println(str) // hello
+  case Failure(ex) => throw ex
+}
+```
+
+__onSuccess__ 
+
+```scala
+onSuccess[T](f: => Future[T])(implicit ec: ExecutionContext)
+onSuccess[T](f: Context => Future[T])(implicit ec: ExecutionContext)
+```
+
+It waits for the completion of a future a passes the future result if successful into the inner action:
+
+```scala
+onSuccess ( Future { "hello" } ) { str =>
+  ctx => println(str) // hello
+}
+```
+
+It can also accept as a parameter a function that returns a future from a context:
+
+```scala
+onSuccess ( ctx => Future { "hello" } ) { str =>
+  ctx => println(str) // hello
+}
+```
+
+__onFailure__ 
+
+```scala
+onFailure[T](f: => Future[T])(implicit ec: ExecutionContext)
+onFailure[T](f: Context => Future[T])(implicit ec: ExecutionContext)
+```
+
+It waits for the completion of a future a passes the future result if successful into the inner action:
+
+```scala
+onFailure ( Future { throw new Exception("Future failure") } ) { ex =>
+  ctx => throw ex
+}
+```
+
+It can also accept as a parameter a function that returns a future from a context:
+
+```scala
+onFailure ( ctx => Future { throw new Exception("Future failure") } ) { ex =>
+  ctx => throw ex
+}
+```
+
+__after__ 
+
+```scala
+after[T](delay: FiniteDuration)(implicit ec: ExecutionContext, ac: ActorContext)
+```
+
+It exectues the inner action after a given delay:
+
+```scala
+after ( 3 seconds ) {
+  ctx => Unit
+}
+```
+
+#### Custom Actions
+
+All the actions above have same result type, which extends the following abstract class:
+
+```scala
+abstract class ChainableAction[L <: HList]
+```
+
+To create a custom action you can use the following 2 helper types:
+
+```scala
+type ChainableAction0 = ChainableAction[HNil]
+type ChainableAction1[T] = ChainableAction[T :: HNil]
+```
+
+The first type returns a chainable action, which will call the inner action by passing only the context as an argument, while the second one will pass a custom value of type T that can be used by the inner action.
+
+Let's use `mapContext` and `provide` as an example that return the 2 chainable action types:
+
+```scala
+def mapContext(f: Context => Context): ChainableAction0
+def provide[T](value: T): ChainableAction1[T]
+```
+
+The ChainableAction0 will then have an apply method with the following signature:
+
+```scala
+def apply(fn: Action)
+```
+
+Where `Action` is a shorthand type for `Context => Unit`.
+
+While for `ChainableAction1[String]` would be:
+
+```scala
+def apply(fn: String => Action)
+```
+
+To define a custom chainable action we need to define the happly method part of the abstract class `ChainableAction`:
+
+```scala
+abstract class ChainableAction[L <: HList] { self =>
+  def happly(f: L => Action): Action
+}
+```
+
+Here's an example of a custom action that returns a `ChainableAction0`, which prints "hello" and then calls the inner action:
+
+```scala
+// define it
+def printHello: ChainableAction0 = new ChainableAction0 {
+  def happly(inner: HNil => Action) = { ctx =>
+    println("hello")
+    inner(HNil)(ctx)
+  }
+}
+
+// then use it
+printHello {
+  ctx => Unit
+}
+```
+
+Here's an example of a custom action that returns a `ChainableAction1[Int]`, which passes a random integer to the inner action:
+
+```scala
+// define it
+def randomize: ChainableAction1[Int] = new ChainableAction1[Int] {
+  def happly(inner: Int :: HNil => Action) = { ctx =>
+    val randomInt = scala.util.Random.nextInt
+    inner(randomInt :: HNil)(ctx)
+  }
+}
+
+// then use it
+randomize { randomInt =>
+  ctx => Unit
+}
+```
 
 License
 -------
