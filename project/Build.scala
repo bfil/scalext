@@ -39,7 +39,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % "2.3.3",
     "org.specs2" %% "specs2" % "2.3.12" % "test",
     "org.mockito" % "mockito-all" % "1.9.5" % "test",
-    "org.hamcrest" % "hamcrest-all" % "1.3")
+    "org.hamcrest" % "hamcrest-all" % "1.3" % "test")
 }
 
 object Resolvers {
