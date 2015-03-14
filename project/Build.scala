@@ -13,11 +13,12 @@ object ProjectBuild extends BFilBuild with BFilPlugins {
 object Dependencies {
   def all(scalaVersion: String) = Seq(
     scalaVersion match {
-      case "2.11.2" => "com.chuusai" %% "shapeless" % "2.0.0"
-      case "2.10.4" => "com.chuusai" %% "shapeless" % "1.2.4"
+      case "2.11.6" => "com.chuusai" %% "shapeless" % "2.0.0"
+      case "2.10.5" => "com.chuusai" %% "shapeless" % "1.2.4"
     },
-    "com.typesafe.akka" %% "akka-actor" % "2.3.3",
-    "org.specs2" %% "specs2" % "2.3.12" % "test",
-    "org.mockito" % "mockito-all" % "1.9.5" % "test",
+    "com.typesafe.akka" %% "akka-actor" % "2.3.9",
+    "org.specs2" %% "specs2-core" % "2.4.17" % "test",
+    "org.specs2" %% "specs2-mock" % "2.4.17" % "test",
+    "org.mockito" % "mockito-all" % "1.10.19" % "test",
     "org.hamcrest" % "hamcrest-all" % "1.3" % "test")
 }
