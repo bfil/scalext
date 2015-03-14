@@ -1,6 +1,8 @@
 Scalext
 =======
 
+[![Build Status](https://snap-ci.com/bfil/scalext/branch/master/build_image)](https://snap-ci.com/bfil/scalext/branch/master)
+
 A scala library that enable the creation of contextual DSLs, inspired by the routing module of [Spray](http://spray.io/).
 
 It uses part of the internal code of [spray-routing](https://github.com/spray/spray/tree/master/spray-routing/src/main/scala/spray/routing) and its directives, but enables to use custom contexts and create a context-specific DSL.
