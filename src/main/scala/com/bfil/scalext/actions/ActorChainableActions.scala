@@ -4,7 +4,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.FiniteDuration
 
 import akka.actor.ActorContext
-import shapeless.HNil
 
 trait ActorChainableActions[T] extends BasicChainableActions[T] {
   def after(magnet: AfterDelayMagnet): ChainableAction0 = magnet
@@ -13,9 +12,9 @@ trait ActorChainableActions[T] extends BasicChainableActions[T] {
 
   object AfterDelayMagnet {
     implicit def apply[T](delay: FiniteDuration)(implicit ec: ExecutionContext, ac: ActorContext) = new AfterDelayMagnet {
-      def happly(inner: HNil => Action) = { ctx =>
+      def tapply(inner: Unit => Action) = { ctx =>
         akka.pattern.after(delay, using = ac.system.scheduler)(Future { Unit }).onComplete {
-          case _ => inner(HNil)(ctx)
+          case _ => inner(())(ctx)
         }
       }
     }

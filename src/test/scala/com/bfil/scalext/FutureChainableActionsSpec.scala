@@ -7,6 +7,20 @@ import scala.util.{Failure, Success}
 class FutureChainableActionsSpec extends ChainableActionsSpec {
 
   "onComplete" should {
+    "compile" in new FutureChainableActionsSpecContext {
+      onComplete(sayHello) {
+        case Success(str) => ctx => success
+        case Failure(str) => ctx => failure
+      }
+
+      onComplete({ ctx: TestContext =>
+        sayHelloUsingContext(ctx)
+      }) {
+        case Success(str) => ctx => success
+        case Failure(str) => ctx => failure
+      }
+    }
+
     "call the inner action with the expected future result on success" in new FutureChainableActionsSpecContext {
       asyncCheck(onComplete(sayHello)) {
         case Success(str) => ctx => str must beEqualTo("hello")
@@ -41,6 +55,18 @@ class FutureChainableActionsSpec extends ChainableActionsSpec {
   }
 
   "onSuccess" should {
+    "compile" in new FutureChainableActionsSpecContext {
+      onSuccess(sayHello) { str =>
+        ctx => success
+      }
+
+      onSuccess({ ctx: TestContext =>
+        sayHelloUsingContext(ctx)
+      }) { str =>
+        ctx => success
+      }
+    }
+
     "call the inner action with the expected future result on success" in new FutureChainableActionsSpecContext {
       asyncCheck(onSuccess(sayHello)) { str =>
         ctx => str must beEqualTo("hello")
@@ -71,6 +97,18 @@ class FutureChainableActionsSpec extends ChainableActionsSpec {
   }
 
   "onFailure" should {
+    "compile" in new FutureChainableActionsSpecContext {
+      onFailure(throwAnException) { ex =>
+        ctx => success
+      }
+
+      onFailure({ ctx: TestContext =>
+        throwAnExceptionUsingContext(ctx)
+      }) { ex =>
+        ctx => success
+      }
+    }
+
     "call the inner action with the exception thrown on failure" in new FutureChainableActionsSpecContext {
       asyncCheck(onFailure(throwAnException)) { ex =>
         ctx => ex.getMessage must beEqualTo("Something went wrong")

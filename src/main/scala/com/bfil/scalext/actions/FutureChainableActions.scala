@@ -3,68 +3,78 @@ package com.bfil.scalext.actions
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-import shapeless.{:: => ::, HNil}
-
 trait FutureChainableActions[T] extends BasicChainableActions[T] {
-  def onComplete[T](magnet: OnCompleteMagnet[T]): ChainableAction1[Try[T]] = magnet
+  def onComplete[T](magnet: OnCompleteMagnet[T]): ChainableAction1[Try[T]] = magnet.action
 
-  trait OnCompleteMagnet[T] extends ChainableAction1[Try[T]]
+  trait OnCompleteMagnet[T] {
+    val action: ChainableAction1[Try[T]]
+  }
 
   object OnCompleteMagnet {
     implicit def apply[T](f: => Future[T])(implicit ec: ExecutionContext) = new OnCompleteMagnet[T] {
-      def happly(inner: Try[T] :: HNil => Action) = { ctx =>
-        f.onComplete {
-          case result => inner(result :: HNil)(ctx)
-        }
+      val action: ChainableAction1[Try[T]] = ChainableAction { inner =>
+        ctx =>
+          f.onComplete {
+            case result => inner(Tuple1(result))(ctx)
+          }
       }
     }
     implicit def apply[T](f: Context => Future[T])(implicit ec: ExecutionContext) = new OnCompleteMagnet[T] {
-      def happly(inner: Try[T] :: HNil => Action) = { ctx =>
-        f(ctx).onComplete {
-          case result => inner(result :: HNil)(ctx)
-        }
+      val action: ChainableAction1[Try[T]] = ChainableAction { inner =>
+        ctx =>
+          f(ctx).onComplete {
+            case result => inner(Tuple1(result))(ctx)
+          }
       }
     }
   }
 
-  def onSuccess[T](magnet: OnSuccessMagnet[T]): ChainableAction1[T] = magnet
+  def onSuccess[T](magnet: OnSuccessMagnet[T]): ChainableAction1[T] = magnet.action
 
-  trait OnSuccessMagnet[T] extends ChainableAction1[T]
+  trait OnSuccessMagnet[T] {
+    val action: ChainableAction1[T]
+  }
 
   object OnSuccessMagnet {
     implicit def apply[T](f: => Future[T])(implicit ec: ExecutionContext) = new OnSuccessMagnet[T] {
-      def happly(inner: T :: HNil => Action) = { ctx =>
-        f.onSuccess {
-          case result => inner(result :: HNil)(ctx)
-        }
+      val action: ChainableAction1[T] = ChainableAction { inner =>
+        ctx =>
+          f.onSuccess {
+            case result => inner(Tuple1(result))(ctx)
+          }
       }
     }
     implicit def apply[T](f: Context => Future[T])(implicit ec: ExecutionContext) = new OnSuccessMagnet[T] {
-      def happly(inner: T :: HNil => Action) = { ctx =>
-        f(ctx).onSuccess {
-          case result => inner(result :: HNil)(ctx)
-        }
+      val action: ChainableAction1[T] = ChainableAction { inner =>
+        ctx =>
+          f(ctx).onSuccess {
+            case result => inner(Tuple1(result))(ctx)
+          }
       }
     }
   }
-  
-  def onFailure[T](magnet: OnFailureMagnet): ChainableAction1[Throwable] = magnet
 
-  trait OnFailureMagnet extends ChainableAction1[Throwable]
+  def onFailure[T](magnet: OnFailureMagnet): ChainableAction1[Throwable] = magnet.action
+
+  trait OnFailureMagnet {
+    val action: ChainableAction1[Throwable]
+  }
 
   object OnFailureMagnet {
     implicit def apply[T](f: => Future[T])(implicit ec: ExecutionContext) = new OnFailureMagnet {
-      def happly(inner: Throwable :: HNil => Action) = { ctx =>
-        f.onFailure {
-          case ex => inner(ex :: HNil)(ctx)
-        }
+      val action: ChainableAction1[Throwable] = ChainableAction { inner =>
+        ctx =>
+          f.onFailure {
+            case ex => inner(Tuple1(ex))(ctx)
+          }
       }
     }
     implicit def apply[T](f: Context => Future[T])(implicit ec: ExecutionContext) = new OnFailureMagnet {
-      def happly(inner: Throwable :: HNil => Action) = { ctx =>
-        f(ctx).onFailure {
-          case ex => inner(ex :: HNil)(ctx)
-        }
+      val action: ChainableAction1[Throwable] = ChainableAction { inner =>
+        ctx =>
+          f(ctx).onFailure {
+            case ex => inner(Tuple1(ex))(ctx)
+          }
       }
     }
   }
