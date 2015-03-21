@@ -8,4 +8,7 @@ trait ActorChainableActionsSpecContext extends ActorChainableActions[TestContext
   implicit val actorSystem = ActorSystem("test-system")
   implicit val actorContext = mock[ActorContext]
   actorContext.system returns actorSystem
+
+  // needed to overcome ambiguous reference to overloaded definition
+  override def after(magnet: AfterDelayMagnet): ChainableAction0 = magnet
 }
