@@ -16,7 +16,7 @@ Using SBT, add the following dependency to your build file:
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.bfil" %% "scalext" % "0.1.0"
+  "com.bfil" %% "scalext" % "0.2.0"
 )
 ```
 
@@ -26,13 +26,19 @@ Don't forget to add the following resolver:
 resolvers += "BFil Nexus Releases" at "http://nexus.b-fil.com/nexus/content/repositories/releases/"
 ```
 
+If you need to test your custom actions, use the testkit:
+
+```scala
+"com.bfil" %% "scalext-testkit" % "0.2.0" % "test"
+```
+
 ### Using snapshots
 
 If you need a snapshot dependency:
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.bfil" %% "scalext" % "0.2.0-SNAPSHOT"
+  "com.bfil" %% "scalext" % "0.3.0-SNAPSHOT"
 )
 
 resolvers += "BFil Nexus Snapshots" at "http://nexus.b-fil.com/nexus/content/repositories/snapshots/";
@@ -281,14 +287,14 @@ after ( 3 seconds ) {
 All the actions above have same result type, which extends the following abstract class:
 
 ```scala
-abstract class ChainableAction[L <: HList]
+abstract class ChainableAction[L]
 ```
 
 To create a custom action you can use the following 2 helper types:
 
 ```scala
-type ChainableAction0 = ChainableAction[HNil]
-type ChainableAction1[T] = ChainableAction[T :: HNil]
+type ChainableAction0 = ChainableAction[Unit]
+type ChainableAction1[T] = ChainableAction[Tuple1[T]]
 ```
 
 The first type returns a chainable action, which will call the inner action by passing only the context as an argument, while the second one will pass a custom value of type T that can be used by the inner action.
@@ -314,11 +320,19 @@ While for `ChainableAction1[String]` would be:
 def apply(fn: String => Action)
 ```
 
-To define a custom chainable action we need to define the happly method part of the abstract class `ChainableAction`:
+To define a custom chainable action we can use the apply method defined on the `ChainableAction` companion object:
 
 ```scala
-abstract class ChainableAction[L <: HList] { self =>
-  def happly(f: L => Action): Action
+object ChainableAction {
+  def apply[T: Tuple](f: (T => Action) => Action): ChainableAction[T]
+}
+```
+
+or we can define the tapply method part of the abstract class `ChainableAction` directly:
+
+```scala
+abstract class ChainableAction[L](implicit val ev: Tuple[L]) {
+  def tapply(f: L => Action): Action
 }
 ```
 
@@ -326,16 +340,15 @@ Here's an example of a custom action that returns a `ChainableAction0`, which pr
 
 ```scala
 // define it
-def printHello: ChainableAction0 = new ChainableAction0 {
-  def happly(inner: HNil => Action) = { ctx =>
+def printHello: ChainableAction0 = ChainableAction { inner =>
+  ctx =>
     println("hello")
-    inner(HNil)(ctx)
+    inner(())(ctx)
   }
-}
 
 // then use it
 printHello {
-  ctx => Unit
+  ctx => ()
 }
 ```
 
@@ -343,18 +356,22 @@ Here's an example of a custom action that returns a `ChainableAction1[Int]`, whi
 
 ```scala
 // define it
-def randomize: ChainableAction1[Int] = new ChainableAction1[Int] {
-  def happly(inner: Int :: HNil => Action) = { ctx =>
+def randomize: ChainableAction1[Int] = ChainableAction { inner =>
+  ctx =>
     val randomInt = scala.util.Random.nextInt
-    inner(randomInt :: HNil)(ctx)
-  }
+    inner(Tuple1(randomInt))(ctx)
 }
 
 // then use it
 randomize { randomInt =>
-  ctx => Unit
+  ctx => println(randomInt)
 }
 ```
+
+Projects using Sclaext
+----------------------
+
+- [scalescrape](https://github.com/bfil/scalescrape) - an actor-based web scraping library
 
 License
 -------

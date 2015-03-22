@@ -1,0 +1,11 @@
+Version 0.2.0 (2015-03-22)
+--------------------------
+- removed dependency on shapeless
+- simplified the creation of custom chainable actions
+- split the testkit into a separate module
+- testkit simplification
+
+
+Version 0.1.0 (2014-06-23)
+--------------------------
+first public release

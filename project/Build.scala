@@ -4,7 +4,7 @@ import com.bfil.sbt._
 
 object ProjectBuild extends BFilBuild {
 
-  val buildVersion = "0.2.0-SNAPSHOT"
+  val buildVersion = "0.2.0"
 
   lazy val root = BFilRootProject("root", file("."))
     .aggregate(scalext, scalextTestkit, scalextTests)
