@@ -2,6 +2,7 @@ Scalext
 =======
 
 [![Build Status](https://snap-ci.com/bfil/scalext/branch/master/build_image)](https://snap-ci.com/bfil/scalext/branch/master)
+[![Codacy Badge](https://www.codacy.com/project/badge/76913171ff464582bfeb83773d9bf873)](https://www.codacy.com/app/bfil/scalext)
 
 A scala library that enable the creation of contextual DSLs, inspired by the routing module of [Spray](http://spray.io/).
 
