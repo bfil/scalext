@@ -2,9 +2,12 @@ package com.bfil.scalext
 
 import java.util.concurrent.TimeoutException
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
-class ActorChainableActionsSpec extends ChainableActionsSpec {
+import org.specs2.mutable.Specification
+
+class ActorChainableActionsSpec extends Specification {
 
   "after" should {
     "compile" in new ActorChainableActionsSpecContext {
@@ -19,7 +22,7 @@ class ActorChainableActionsSpec extends ChainableActionsSpec {
         ctx =>
           val elapsed = System.currentTimeMillis - start
           elapsed.toInt must beGreaterThan(500)
-      }.await must not(throwA[TimeoutException])
+      }.await must throwA[TimeoutException].not
     }
 
     "throw a timeout exception with a delay > 1 second" in new ActorChainableActionsSpecContext {

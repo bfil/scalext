@@ -4,7 +4,9 @@ import java.util.concurrent.TimeoutException
 
 import scala.util.{Failure, Success}
 
-class FutureChainableActionsSpec extends ChainableActionsSpec {
+import org.specs2.mutable.Specification
+
+class FutureChainableActionsSpec extends Specification {
 
   "onComplete" should {
     "compile" in new FutureChainableActionsSpecContext {

@@ -12,5 +12,5 @@ trait BasicChainableActions[T] extends ChainableActions[T] {
   def tprovide[L: Tuple](values: L): ChainableAction[L] = ChainableAction { _(values) }
 
   def extract[T](f: Context => T): ChainableAction1[T] = textract(ctx => Tuple1(f(ctx)))
-  def textract[L: Tuple](f: Context ⇒ L): ChainableAction[L] = ChainableAction { inner => ctx => inner(f(ctx))(ctx) }
+  def textract[L: Tuple](f: Context => L): ChainableAction[L] = ChainableAction { inner => ctx => inner(f(ctx))(ctx) }
 }

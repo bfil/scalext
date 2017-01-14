@@ -1,6 +1,8 @@
 package com.bfil.scalext
 
-class BasicChainableActionsSpec extends ChainableActionsSpec {
+import org.specs2.mutable.Specification
+
+class BasicChainableActionsSpec extends Specification {
 
   "pass" should {
     "compile" in new BasicChainableActionsSpecContext {

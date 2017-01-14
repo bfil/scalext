@@ -11,13 +11,15 @@ It uses part of the internal code of [spray-routing](https://github.com/spray/sp
 Setting up the dependencies
 ---------------------------
 
-__Scalext__ is available at my [Nexus Repository](http://nexus.b-fil.com/nexus/content/groups/public/), and it is cross compiled and published for both Scala 2.10 and 2.11.
+__Scalext__ is available at my [Nexus Repository](http://nexus.b-fil.com/nexus/content/groups/public/), and it is cross compiled and published for Scala 2.12, 2.11 and 2.10.
+
+Since version `0.3.0` Akka has been updated to 2.4.x for Scala 2.12 and 2.11.
 
 Using SBT, add the following dependency to your build file:
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.bfil" %% "scalext" % "0.2.0"
+  "com.bfil" %% "scalext" % "0.3.0"
 )
 ```
 
@@ -30,7 +32,7 @@ resolvers += "BFil Nexus Releases" at "http://nexus.b-fil.com/nexus/content/repo
 If you need to test your custom actions, use the testkit:
 
 ```scala
-"com.bfil" %% "scalext-testkit" % "0.2.0" % "test"
+"com.bfil" %% "scalext-testkit" % "0.3.0" % "test"
 ```
 
 ### Using snapshots
@@ -39,7 +41,7 @@ If you need a snapshot dependency:
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.bfil" %% "scalext" % "0.3.0-SNAPSHOT"
+  "com.bfil" %% "scalext" % "0.4.0-SNAPSHOT"
 )
 
 resolvers += "BFil Nexus Snapshots" at "http://nexus.b-fil.com/nexus/content/repositories/snapshots/";
@@ -80,7 +82,7 @@ In this example we create an initial action `startWith` that accepts an initial 
 ```scala
 def startWith(initialValue: Long)(action: Action) = {
   val p = Promise[Double]
-  action(ArithmeticContext(p, initialValue)) 
+  action(ArithmeticContext(p, initialValue))
   p.future
 }
 ```
@@ -97,7 +99,7 @@ def divideBy(value: Double) = mapContext(ctx => ctx.copy(value = ctx.value / val
 ```
 
 The inner most method of the DSL usually must be a simple action that takes the context object and returns Unit, what we want to do is completing the promise by passing in it the result of our calculation.
-  
+
 ```scala
   def returnResult = ActionResult { ctx => ctx.resultPromise.completeWith(Future { ctx.value }) }
 ```
@@ -108,7 +110,7 @@ Finally using our `CalculatorDsl` in our code will look like this:
 
 ```scala
 class Calculator extends CalculatorDsl {
-  def performCalculation: Future[Double] = 
+  def performCalculation: Future[Double] =
     startWith(2) {
       add(3) {
         multiplyBy(3) {
@@ -156,7 +158,7 @@ type Action = Context => Unit
 
 The following DSL actions can be used as basic helpers to create other DSL actions
 
-__mapContext__ 
+__mapContext__
 
 ```scala
 mapContext(f: Context => Context)
@@ -170,7 +172,7 @@ mapContext ( ctx => updateContext(ctx) ) {
 }
 ```
 
-__provide__ 
+__provide__
 
 ```scala
 provide[T](value: T)
@@ -184,7 +186,7 @@ provide ( "hello" ) { str =>
 }
 ```
 
-__extract__ 
+__extract__
 
 ```scala
 extract[T](f: Context => T)
@@ -198,7 +200,7 @@ extract ( ctx => ctx.total ) { total =>
 }
 ```
 
-__onComplete__ 
+__onComplete__
 
 ```scala
 onComplete[T](f: => Future[T])(implicit ec: ExecutionContext)
@@ -208,7 +210,7 @@ onComplete[T](f: Context => Future[T])(implicit ec: ExecutionContext)
 It waits for the completion of a future a passes the future result into the inner action:
 
 ```scala
-onComplete ( Future { "hello" } ) { 
+onComplete ( Future { "hello" } ) {
   case Success(str) => ctx => println(str) // hello
   case Failure(ex) => throw ex
 }
@@ -217,13 +219,13 @@ onComplete ( Future { "hello" } ) {
 It can also accept as a parameter a function that returns a future from a context:
 
 ```scala
-onComplete ( ctx => Future { "hello" } ) { 
+onComplete ( ctx => Future { "hello" } ) {
   case Success(str) => ctx => println(str) // hello
   case Failure(ex) => throw ex
 }
 ```
 
-__onSuccess__ 
+__onSuccess__
 
 ```scala
 onSuccess[T](f: => Future[T])(implicit ec: ExecutionContext)
@@ -246,7 +248,7 @@ onSuccess ( ctx => Future { "hello" } ) { str =>
 }
 ```
 
-__onFailure__ 
+__onFailure__
 
 ```scala
 onFailure[T](f: => Future[T])(implicit ec: ExecutionContext)
@@ -269,7 +271,7 @@ onFailure ( ctx => Future { throw new Exception("Future failure") } ) { ex =>
 }
 ```
 
-__after__ 
+__after__
 
 ```scala
 after[T](delay: FiniteDuration)(implicit ec: ExecutionContext, ac: ActorContext)
@@ -379,7 +381,7 @@ License
 
 This software is licensed under the Apache 2 license, quoted below.
 
-Copyright © 2014 Bruno Filippone <http://b-fil.com>
+Copyright © 2014-2017 Bruno Filippone <http://b-fil.com>
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of

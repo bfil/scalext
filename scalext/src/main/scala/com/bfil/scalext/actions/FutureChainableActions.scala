@@ -39,7 +39,7 @@ trait FutureChainableActions[T] extends BasicChainableActions[T] {
     implicit def apply[T](f: => Future[T])(implicit ec: ExecutionContext) = new OnSuccessMagnet[T] {
       val action: ChainableAction1[T] = ChainableAction { inner =>
         ctx =>
-          f.onSuccess {
+          f.foreach {
             case result => inner(Tuple1(result))(ctx)
           }
       }
@@ -47,7 +47,7 @@ trait FutureChainableActions[T] extends BasicChainableActions[T] {
     implicit def apply[T](f: Context => Future[T])(implicit ec: ExecutionContext) = new OnSuccessMagnet[T] {
       val action: ChainableAction1[T] = ChainableAction { inner =>
         ctx =>
-          f(ctx).onSuccess {
+          f(ctx).foreach {
             case result => inner(Tuple1(result))(ctx)
           }
       }
@@ -64,7 +64,7 @@ trait FutureChainableActions[T] extends BasicChainableActions[T] {
     implicit def apply[T](f: => Future[T])(implicit ec: ExecutionContext) = new OnFailureMagnet {
       val action: ChainableAction1[Throwable] = ChainableAction { inner =>
         ctx =>
-          f.onFailure {
+          f.failed.foreach {
             case ex => inner(Tuple1(ex))(ctx)
           }
       }
@@ -72,7 +72,7 @@ trait FutureChainableActions[T] extends BasicChainableActions[T] {
     implicit def apply[T](f: Context => Future[T])(implicit ec: ExecutionContext) = new OnFailureMagnet {
       val action: ChainableAction1[Throwable] = ChainableAction { inner =>
         ctx =>
-          f(ctx).onFailure {
+          f(ctx).failed.foreach {
             case ex => inner(Tuple1(ex))(ctx)
           }
       }

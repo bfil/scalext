@@ -2,6 +2,7 @@ package com.bfil.scalext.testkit
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.{Duration, DurationInt}
+import scala.util.control.NonFatal
 
 import com.bfil.scalext.ChainableActions
 
@@ -20,7 +21,7 @@ trait ContextualDslTestkit[T] extends ChainableActions[T] {
           assertions(ctx)
           p.completeWith(Future { () })
         } catch {
-          case ex: Throwable => p.failure(ex)
+          case NonFatal(ex) => p.failure(ex)
         }
       }(ctx)
       CheckAsyncResult(f)
@@ -42,7 +43,7 @@ trait ContextualDslTestkit[T] extends ChainableActions[T] {
             assertions(t)(ctx)
             p.completeWith(Future { () })
           } catch {
-            case ex: Throwable => p.failure(ex)
+            case NonFatal(ex) => p.failure(ex)
           }
       }(ctx)
       CheckAsyncResult(f)

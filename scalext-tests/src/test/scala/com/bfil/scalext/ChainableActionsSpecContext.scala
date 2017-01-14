@@ -1,14 +1,22 @@
 package com.bfil.scalext
 
-import org.specs2.execute.AsResult
-import org.specs2.matcher.{ResultMatchers, ThrownExpectations}
-import org.specs2.mock.Mockito
-import org.specs2.mock.mockito.ArgThat
-import org.specs2.mutable.Around
-
 import com.bfil.scalext.testkit.ContextualDslTestkit
+import org.specs2.execute.AsResult
+import org.specs2.matcher.{Expectations, ResultMatchers, ThrownExpectations}
+import org.specs2.mock._
+import org.specs2.mock.mockito._
+import org.specs2.specification.Scope
 
-trait ChainableActionsSpecContext extends Around with Mockito with ArgThat with ThrownExpectations with ResultMatchers with ContextualDslTestkit[TestContext] {
+trait ChainableActionsSpecContext extends Scope
+  with MockitoWithNoCalledMatchers with ThrownExpectations with ResultMatchers
+  with ContextualDslTestkit[TestContext] {
   implicit val defautContext = TestContext("test", 0)
-  def around[T: AsResult](t: => T) = AsResult(t)
 }
+
+trait MockitoWithNoCalledMatchers extends MocksCreation
+  with MockitoStubs
+  with CapturedArgument
+  with MockitoMatchers
+  with ArgThat
+  with Expectations
+  with MockitoFunctions

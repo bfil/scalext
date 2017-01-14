@@ -1,3 +1,8 @@
+Version 0.3.0 (2015-01-14)
+--------------------------
+- added Scala 2.12 support
+- updated to Akka 2.4 for Scala 2.12 and Scala 2.12 releases
+
 Version 0.2.0 (2015-03-22)
 --------------------------
 - removed dependency on shapeless
