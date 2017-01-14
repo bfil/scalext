@@ -22,7 +22,7 @@ class ActorChainableActionsSpec extends Specification {
         ctx =>
           val elapsed = System.currentTimeMillis - start
           elapsed.toInt must beGreaterThan(500)
-      }.await must throwA[TimeoutException].not
+      }.await must not(throwA[TimeoutException])
     }
 
     "throw a timeout exception with a delay > 1 second" in new ActorChainableActionsSpecContext {
