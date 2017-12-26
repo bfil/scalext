@@ -1,7 +1,15 @@
+Version 0.4.0 (2017-12-26)
+--------------------------
+- renamed organization and packages from com.bfil to io.bfil
+- published the library to Bintray
+- updated akka-actor to 2.3.16 and 2.5.8
+
+
 Version 0.3.0 (2015-01-14)
 --------------------------
 - added Scala 2.12 support
 - updated to Akka 2.4 for Scala 2.12 and Scala 2.12 releases
+
 
 Version 0.2.0 (2015-03-22)
 --------------------------

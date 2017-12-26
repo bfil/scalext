@@ -1,4 +1,4 @@
-package com.bfil.scalext.actions
+package io.bfil.scalext.actions
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try

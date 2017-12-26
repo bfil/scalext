@@ -1,6 +1,6 @@
-package com.bfil.scalext
+package io.bfil.scalext
 
-import com.bfil.scalext.testkit.ContextualDslTestkit
+import io.bfil.scalext.testkit.ContextualDslTestkit
 import org.specs2.execute.AsResult
 import org.specs2.matcher.{Expectations, ThrownExpectations}
 import org.specs2.mock._

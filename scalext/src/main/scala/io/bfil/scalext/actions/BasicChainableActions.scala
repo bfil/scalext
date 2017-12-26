@@ -1,6 +1,6 @@
-package com.bfil.scalext.actions
+package io.bfil.scalext.actions
 
-import com.bfil.scalext.{ChainableActions, Tuple}
+import io.bfil.scalext.{ChainableActions, Tuple}
 
 trait BasicChainableActions[T] extends ChainableActions[T] {
   def pass: ChainableAction0 = ChainableAction.Empty

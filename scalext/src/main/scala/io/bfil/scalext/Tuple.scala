@@ -1,4 +1,4 @@
-package com.bfil.scalext
+package io.bfil.scalext
 
 sealed trait Tuple[T]
 

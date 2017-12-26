@@ -1,5 +1,5 @@
-package com.bfil.scalext
+package io.bfil.scalext
 
-import com.bfil.scalext.actions.BasicChainableActions
+import io.bfil.scalext.actions.BasicChainableActions
 
 trait BasicChainableActionsSpecContext extends BasicChainableActions[TestContext] with ChainableActionsSpecContext

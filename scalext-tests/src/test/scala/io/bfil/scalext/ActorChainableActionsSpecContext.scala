@@ -1,9 +1,9 @@
-package com.bfil.scalext
+package io.bfil.scalext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import akka.actor.{ActorContext, ActorSystem}
-import com.bfil.scalext.actions.ActorChainableActions
+import io.bfil.scalext.actions.ActorChainableActions
 
 trait ActorChainableActionsSpecContext extends ActorChainableActions[TestContext] with ChainableActionsSpecContext {
   implicit val actorSystem = ActorSystem("test-system")

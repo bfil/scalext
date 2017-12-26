@@ -1,7 +1,6 @@
 Scalext
 =======
 
-[![Build Status](https://snap-ci.com/bfil/scalext/branch/master/build_image)](https://snap-ci.com/bfil/scalext/branch/master)
 [![Codacy Badge](https://www.codacy.com/project/badge/76913171ff464582bfeb83773d9bf873)](https://www.codacy.com/app/bfil/scalext)
 
 A scala library that enable the creation of contextual DSLs, inspired by the routing module of [Spray](http://spray.io/).
@@ -11,40 +10,22 @@ It uses part of the internal code of [spray-routing](https://github.com/spray/sp
 Setting up the dependencies
 ---------------------------
 
-__Scalext__ is available at my [Nexus Repository](http://nexus.b-fil.com/nexus/content/groups/public/), and it is cross compiled and published for Scala 2.12, 2.11 and 2.10.
+__Scalext__ is available on `Maven Central` (since version `0.4.0`), and it is cross compiled and published for Scala 2.12, 2.11 and 2.10.
 
-Since version `0.3.0` Akka has been updated to 2.4.x for Scala 2.12 and 2.11.
+*Older artifacts versions are not available anymore due to the shutdown of my self-hosted Nexus Repository in favour of Bintray*
 
 Using SBT, add the following dependency to your build file:
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.bfil" %% "scalext" % "0.3.0"
+  "io.bfil" %% "scalext" % "0.4.0"
 )
 ```
 
-Don't forget to add the following resolver:
+If you have issues resolving the dependency, you can add the following resolver:
 
 ```scala
-resolvers += "BFil Nexus Releases" at "http://nexus.b-fil.com/nexus/content/repositories/releases/"
-```
-
-If you need to test your custom actions, use the testkit:
-
-```scala
-"com.bfil" %% "scalext-testkit" % "0.3.0" % "test"
-```
-
-### Using snapshots
-
-If you need a snapshot dependency:
-
-```scala
-libraryDependencies ++= Seq(
-  "com.bfil" %% "scalext" % "0.4.0-SNAPSHOT"
-)
-
-resolvers += "BFil Nexus Snapshots" at "http://nexus.b-fil.com/nexus/content/repositories/snapshots/";
+resolvers += Resolver.bintrayRepo("bfil", "maven")
 ```
 
 Usage
@@ -381,7 +362,7 @@ License
 
 This software is licensed under the Apache 2 license, quoted below.
 
-Copyright © 2014-2017 Bruno Filippone <http://b-fil.com>
+Copyright © 2014-2017 Bruno Filippone <http://bfil.io>
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of

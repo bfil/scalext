@@ -1,8 +1,8 @@
-package com.bfil.scalext
+package io.bfil.scalext
 
 import scala.concurrent.Future
 
-import com.bfil.scalext.actions.FutureChainableActions
+import io.bfil.scalext.actions.FutureChainableActions
 
 trait FutureChainableActionsSpecContext extends FutureChainableActions[TestContext] with ChainableActionsSpecContext {
 

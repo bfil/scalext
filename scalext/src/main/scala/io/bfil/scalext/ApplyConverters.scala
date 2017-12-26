@@ -1,4 +1,4 @@
-package com.bfil.scalext
+package io.bfil.scalext
 
 trait ApplyConverters[T] extends ContextualTypes[T] {
   abstract class ApplyConverter[L] {

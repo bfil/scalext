@@ -1,4 +1,4 @@
-package com.bfil.scalext
+package io.bfil.scalext
 
 import org.specs2.mutable.Specification
 

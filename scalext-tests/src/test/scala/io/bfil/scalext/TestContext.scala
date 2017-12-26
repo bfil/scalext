@@ -1,3 +1,3 @@
-package com.bfil.scalext
+package io.bfil.scalext
 
 case class TestContext(key: String, value: Int)
